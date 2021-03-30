@@ -2,7 +2,7 @@ settings.py
 lib/
 share/
 lib64
-inclide/
+include/
 bin/
 .idea/
 __pycache__/
