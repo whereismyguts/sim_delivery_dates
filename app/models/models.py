@@ -22,6 +22,9 @@ class RegionDeliverySchedule(DerriveClass):
 
     def __init__(self, *args, **kwargs):
         super(RegionDeliverySchedule, self).__init__(*args, **kwargs)
+        self.validate_raw_data()
+
+    def validate_raw_data(self):
         self.parsed_holidays
         self.parsed_special_time_slots
         map(self.parse_slot, self.time_slots_workdays.split(','))
@@ -41,7 +44,13 @@ class RegionDeliverySchedule(DerriveClass):
     @property
     def parsed_holidays(self):
         try:
-            return list(map(self.parse_date, self.holidays.split(',')))
+            day_strings = self.holidays.split(',')
+            print('day_strings')
+            print(day_strings)
+            if day_strings and all(day_strings):
+                return list(map(self.parse_date, day_strings))
+            else:
+                return []
         except Exception as e:
             # TODO DataParseError
             raise
@@ -60,7 +69,7 @@ class RegionDeliverySchedule(DerriveClass):
 
         return slots_by_day
 
-    def check(self, dt: datetime) -> list:
+    def get_timeslots(self, dt: datetime) -> list:
         date = dt.date()
 
         if date in self.parsed_holidays:
@@ -96,5 +105,5 @@ if __name__ == '__main__':
     ]
     for date, result in dates:
 
-        print(date, sh.check(date), result)
-        assert(sh.check(date) == result)
+        print(date, sh.get_timeslots(date), result)
+        assert(sh.get_timeslots(date) == result)

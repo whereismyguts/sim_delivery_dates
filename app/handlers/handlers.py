@@ -59,7 +59,7 @@ class DeliveryDatetimesHandler(ApiHandler):
                 "result": 1,
                 "error": 0,
 
-                "delivery_info_text":  {s[0]: u"Автоматически подключится выбранный тариф" for s in subject_prices }
+                "delivery_info_text":  {s[0]: u"Автоматически подключится выбранный тариф" for s in subject_prices },
                 "delivery_prices": dict(subject_prices),
                 "default_region": "46000000000",
             }
@@ -80,7 +80,7 @@ class DeliveryDatetimesHandler(ApiHandler):
         today = datetime.datetime.strptime(local_time, '%Y.%m.%dT%H:%M:%S')
         for i in range(1, 30):
             day = today + datetime.timedelta(days=i)
-            slots = schedule.check(day)
+            slots = schedule.get_timeslots(day)
             if slots:
                 delivery_times[day.strftime('%d.%m.%Y')] = slots
             if len(delivery_times) < 5:
