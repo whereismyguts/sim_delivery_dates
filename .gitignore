@@ -1,0 +1,10 @@
+settings.py
+lib/
+share/
+lib64
+inclide/
+bin/
+.idea/
+__pycache__/
+pyvenv.cfg
+*.whl
