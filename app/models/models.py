@@ -6,7 +6,7 @@ from app.models.mock import MockModel
 
 __all__ = ('RegionDeliverySchedule',)
 
-TEST = True
+TEST = False
 
 from app.models import *
 

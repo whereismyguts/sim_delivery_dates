@@ -6,11 +6,11 @@ import datetime
 
 
 class RealModel(BaseModel, AppDecBase):
-    __tablename__ = "region_delivery_schedule"
+    __tablename__ = "region_delivery_schedule_2"
 
     id = Column(Integer, primary_key=True)
 
-    region_id = Column(Integer, index=True)  # OKATO
+    region_id = Column(String, index=True)  # OKATO
     subject_name = Column(String, index=True)  # city
 
     default_delivery_price = Column(Integer, default=300)

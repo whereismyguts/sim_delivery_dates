@@ -122,7 +122,6 @@ class DjangoQuery(Query):
             session,
             model,
             entities=None,
-            redis=None,
             base_filters=None
     ):
         if not (
@@ -138,7 +137,6 @@ class DjangoQuery(Query):
 
         super(self.__class__, self).__init__(entities, session)
         self.model = model
-        self.redis = redis
         self.base_filters = base_filters or {}
 
         self.entities = entities
@@ -148,7 +146,6 @@ class DjangoQuery(Query):
             self.session,
             self.model,
             entities=entities,
-            redis=self.redis,
             base_filters=self.base_filters,
         )
 
@@ -384,21 +381,17 @@ class BaseModel:
         return sql_and(*cls.__sql_search_filters(model_field, search_words))
 
     @classmethod
-    def query(cls, db_session=None, redis=None, entities=None, base_filters=None):
+    def query(cls, db_session=None, entities=None, base_filters=None):
         if base_filters is None:
             base_filters = cls.BASE_MODEL_FILTERS
 
         if db_session is None:
             db_session = cls.db_session
 
-        if redis is None:
-            redis = cls.redis
-
         query = DjangoQuery(
             db_session,
             cls,
             entities=entities,
-            redis=redis,
             base_filters=base_filters
         )
         return query
