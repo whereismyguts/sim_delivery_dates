@@ -5,7 +5,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 import datetime
 
 
-class RealModel(BaseModel, AppDecBase):
+class RegionDeliveryScheduleDbModel(BaseModel, AppDecBase):
     __tablename__ = "region_delivery_schedule_2"
 
     id = Column(Integer, primary_key=True)

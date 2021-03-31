@@ -1,26 +1,31 @@
 import json
 
 import requests
-#
-# url = 'https://test-podkliuchi.sberbank-tele.com'
-#
-# r = requests.post(url + '/api/v1/delivery_date_times')
-# print(r)
 
-data = {'default_region': '41000000000', 'local_time': '2021.02.14T16:10:00'}
 
 def json_data(**kwargs):
     # if 'token' not in kwargs:
     #     kwargs['token'] = TOKEN
     return json.dumps(kwargs)
 
-print('requested url:')
-url = 'https://mobile.sberbank-tele.com/v4.2/order/data'
-print(url)
-response = requests.post(url, data=json_data(**data))
-print(response)
+
+data = {'region_id': '46000000000', 'local_time': '2021.03.30T16:10:00', 'subject': 'Голенищево'}
 
 
+def test_server():
+    url = 'https://test-podkliuchi.sberbank-tele.com'
+    r = requests.post(url + '/api/v1/delivery_date_times', data=json_data(**data))
+    print(r, r.text)
+
+
+def test_current():
+    print('requested url:')
+    url = 'https://mobile.sberbank-tele.com/v4.2/order/data'
+    print(url)
+    response = requests.post(url, data=json_data(**data))
+    print(response)
+
+test_server()
 
 resp_error = {
   "reply": "local_time required in format: \"yyyy.mm.ddTHH:MM:SS\"",

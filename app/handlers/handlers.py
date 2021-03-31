@@ -32,11 +32,12 @@ class UploadDeliveryDatetimesHandler(ApiHandler):
         with open(file_path, 'wb') as f:
             f.write(file_body)
 
-        result = load_delivery_slots(file_path)
+        load_delivery_slots(file_path)
 
         response = dict(
         )
         return response
+
 
 class DeliveryDatetimesHandler(ApiHandler):
 
@@ -59,12 +60,12 @@ class DeliveryDatetimesHandler(ApiHandler):
                 "result": 1,
                 "error": 0,
 
-                "delivery_info_text":  {s[0]: u"Автоматически подключится выбранный тариф" for s in subject_prices },
+                "delivery_info_text":  {s[0]: u"Автоматически подключится выбранный тариф" for s in subject_prices},
                 "delivery_prices": dict(subject_prices),
                 "default_region": "46000000000",
             }
 
-        schedule = RegionDeliverySchedule.query().all(
+        schedule = RegionDeliverySchedule.query().get(
             RegionDeliverySchedule.region_id == region_id,
             RegionDeliverySchedule.subject_name == subject,
             RegionDeliverySchedule.deleted == None,
@@ -83,7 +84,7 @@ class DeliveryDatetimesHandler(ApiHandler):
             slots = schedule.get_timeslots(day)
             if slots:
                 delivery_times[day.strftime('%d.%m.%Y')] = slots
-            if len(delivery_times) < 5:
+            if len(delivery_times) > 5:
                 break
         return {
             "delivery_times": delivery_times,
