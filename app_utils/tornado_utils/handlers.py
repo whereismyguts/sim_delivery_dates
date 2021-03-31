@@ -59,12 +59,9 @@ class AbsHandler(web.RequestHandler):
     @classmethod
     def run_in_thread(cls, worker):
         def target():
-
             try:
                 db_session = create_dbsession()
                 worker(db_session)
-            except Exception as e:
-                alarm.error()
             finally:
                 try:
                     db_session.commit()
@@ -103,16 +100,6 @@ class AbsHandler(web.RequestHandler):
             # self.error('send info', error=err)
             pass
 
-        if text:
-            try:
-                self.alarm.info(text, send_async=True)
-            except:
-                pass
-            try:
-                self.logger.info(text)
-            except:
-                pass
-
     def debug(self, *texts):
         text = ''
         try:
@@ -121,16 +108,6 @@ class AbsHandler(web.RequestHandler):
         except Exception as err:
             # self.error('send debug', error=e)
             pass
-
-        if text:
-            try:
-                self.alarm.debug(text, send_async=True)
-            except:
-                pass
-            try:
-                self.logger.debug(text)
-            except:
-                pass
 
     def error(self, texts, error=None, traceback_text='', trace=True):
         try:
@@ -164,25 +141,6 @@ class AbsHandler(web.RequestHandler):
             text += u'\n{}: {}'.format(error_text, traceback_text)
         except Exception as err:
             self.error('send error', error=err)
-
-        if text:
-            try:
-                self.alarm.error(text, trace=False, send_async=True)
-            except:
-                pass
-            try:
-                self.logger.error(text)
-            except:
-                pass
-
-    def log_exception(self, typ, value, tb):
-        super(AbsHandler, self).log_exception(typ, value, tb)
-        isinstance(value, web.HTTPError) or self.error(
-            u'Uncaught exception',
-            traceback_text=str('\n'.join(
-                traceback.format_exception(typ, value, tb)
-            )),
-        )
 
     def redirect(self, url, permanent=False, status=None):
         """Sends a redirect to the given (optionally relative) URL.

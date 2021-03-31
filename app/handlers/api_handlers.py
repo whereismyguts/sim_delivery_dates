@@ -3,14 +3,15 @@ import datetime
 import random
 import sys
 import time
+import traceback
 
 from app.models.models import BaseModel
 # from app.texts import _text
-from app.exceptions import (
-    AppError, AuthError, GeoError,
-    ApiError, ApiDataError,
-    ServerError, ServerDataError,
-)
+# from app.exceptions import (
+#     AppError, AuthError, GeoError,
+#     ApiError, ApiDataError,
+#     ServerError, ServerDataError,
+# )
 import json
 from app_utils.tornado_utils.handlers import AbsHandler
 
@@ -29,17 +30,17 @@ class ApiHandler(AbsHandler):
 
     SET_ERROR_STATUS_CODE = False
 
-    def raise_api_error(self, **kwargs):
-        raise ApiError(**kwargs)
-
-    def raise_api_data_error(self, **kwargs):
-        raise ApiDataError(**kwargs)
-
-    def raise_server_error(self, **kwargs):
-        raise ServerError(**kwargs)
-
-    def raise_server_data_error(self, **kwargs):
-        raise ServerDataError(**kwargs)
+    # def raise_api_error(self, **kwargs):
+    #     raise ApiError(**kwargs)
+    #
+    # def raise_api_data_error(self, **kwargs):
+    #     raise ApiDataError(**kwargs)
+    #
+    # def raise_server_error(self, **kwargs):
+    #     raise ServerError(**kwargs)
+    #
+    # def raise_server_data_error(self, **kwargs):
+    #     raise ServerDataError(**kwargs)
 
     def _print(self, *strings):
         try:
@@ -82,19 +83,6 @@ class ApiHandler(AbsHandler):
         # print(response_data)
         return
 
-        try:
-            self.debug(
-                u'RESPONSE {}: {} {}'.format(
-                    self.req_id, self.request.uri,
-                    (datetime.datetime.utcnow() - self.req_start)
-                ), json.dumps(
-                    response_data, indent=2,
-                    ensure_ascii=False
-                )
-            )
-        except:
-            pass
-
     def send_response(self, response_data):
         if isinstance(response_data, (dict, list)):
             self.set_header('Content-type', 'application/json')
@@ -113,40 +101,45 @@ class ApiHandler(AbsHandler):
         try:
             self._start_request()
             response_data = handler(*args, **kwargs)
-        except (AuthError, GeoError, ApiDataError) as err:
-            response_data = err.response_data
-            if self.SET_ERROR_STATUS_CODE:
-                status_code = err.status_code
-            self.debug(
-                u'{} {}:\n{}\n{}\n{}'.format(
-                    err.__class__.__name__,
-                    self.__class__.__name__,
-                    self.token_data, self.data,
-                    err
-                )
-            )
-        except AppError as err:
-            response_data = err.response_data
-            if self.SET_ERROR_STATUS_CODE:
-                status_code = err.status_code
-            try:
-                print(self.data)
-            except:
-                pass
-            self.error(
-                u'{} {}:\n{}\n{}'.format(
-                    err.__class__.__name__,
-                    self.__class__.__name__,
-                    self.token_data, self.data,
-                ), error=err, trace=False
-            )
+        # except (AuthError, GeoError, ApiDataError) as err:
+        #     response_data = err.response_data
+        #     if self.SET_ERROR_STATUS_CODE:
+        #         status_code = err.status_code
+        #     self.debug(
+        #         u'{} {}:\n{}\n{}\n{}'.format(
+        #             err.__class__.__name__,
+        #             self.__class__.__name__,
+        #             self.token_data, self.data,
+        #             err
+        #         )
+        #     )
+        # except AppError as err:
+        #     response_data = err.response_data
+        #     if self.SET_ERROR_STATUS_CODE:
+        #         status_code = err.status_code
+        #     try:
+        #         print(self.data)
+        #     except:
+        #         pass
+        #     self.error(
+        #         u'{} {}:\n{}\n{}'.format(
+        #             err.__class__.__name__,
+        #             self.__class__.__name__,
+        #             self.token_data, self.data,
+        #         ), error=err, trace=False
+        #     )
         except Exception as err:
-            response_data = {'error': 'server_error'}
+            response_data = {}
+            print('REQUEST {} ERROR:'.format(self.request.uri))
+            print('DATA: ', self.data)
+            print('TRACE:')
+            print(err, traceback.format_exc())
             if self.SET_ERROR_STATUS_CODE:
                 status_code = 500
 
-            if self.NEED_SERVER_ERROR_ALERT:
-                response_data['alert_text'] = _text('something_wrong')
+            response_data['result'] = 0
+            response_data['error'] = 1
+            response_data['reply'] = 'something_wrong'
 
             self.error(
                 u'{} {}:\n{}\n{}'.format(
@@ -155,11 +148,6 @@ class ApiHandler(AbsHandler):
                     self.token_data, self.data,
                 ), error=err
             )
-
-            try:
-                self.notify_error(_text('something_wrong'), error=err)
-            except:
-                pass
 
             self.db_session.rollback()
             BaseModel.db_session.rollback()
@@ -173,10 +161,10 @@ class ApiHandler(AbsHandler):
         self.handle_request(self._get, args, kwargs)
 
     def _get(self, *args, **kwargs):
-        raise ApiError(error_reason='not valid method', uri=self.request.uri)
+        raise Exception('not valid method', uri=self.request.uri)
 
     def post(self, *args, **kwargs):
         self.handle_request(self._post, args, kwargs)
 
     def _post(self, *args, **kwargs):
-        raise ApiError(error_reason='not valid method', uri=self.request.uri)
+        raise Exception('not valid method', uri=self.request.uri)
