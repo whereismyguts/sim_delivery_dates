@@ -28,8 +28,8 @@ class ParseLogicMixin:
         # print('validate:', self.subject_name, self.region_id)
         self.parsed_holidays
         self.parsed_special_time_slots
-        list(map(self.parse_slot, self.time_slots_workdays.split(',')))
-        list(map(self.parse_slot, self.time_slots_weekend.split(',')))
+        self.get_timeslots_from_raw(self.time_slots_workdays)
+        self.get_timeslots_from_raw(self.time_slots_weekend)
 
     @staticmethod
     def parse_date(dt_string: str):
@@ -57,6 +57,8 @@ class ParseLogicMixin:
     @property
     def parsed_special_time_slots(self) -> dict:
         slots_by_day = dict()
+        if not (self.special_time_slots or '').strip():
+            return {}
         try:
             for line in self.special_time_slots.split(';'):
                 dt_str, slots_str = line.split('/')
@@ -67,6 +69,12 @@ class ParseLogicMixin:
             ))
 
         return slots_by_day
+
+    @classmethod
+    def get_timeslots_from_raw(cls, raw):
+        if str(raw or '').strip() == '':
+            return []
+        return list(map(cls.parse_slot, raw.split(',')))
 
     def get_timeslots(self, dt: datetime) -> list:
 
@@ -81,9 +89,9 @@ class ParseLogicMixin:
             return self.parsed_special_time_slots[date]
 
         if date.weekday() in self.WORKDAYS:
-            return list(map(self.parse_slot, self.time_slots_workdays.split(',')))
+            return self.get_timeslots_from_raw(self.time_slots_workdays)
         else:
-            return list(map(self.parse_slot, self.time_slots_weekend.split(',')))
+            return self.get_timeslots_from_raw(self.time_slots_weekend)
 
 
 class RegionDeliverySchedule(ParseLogicMixin, RegionDeliveryScheduleDbModel):

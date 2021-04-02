@@ -69,6 +69,22 @@ class TestSuit():
             passed = True
         assert(passed)
 
+    @staticmethod
+    def test_3():
+        print('EMPTY MARKUP TEST 1')
+
+        sh = tear_up()
+        sh.special_time_slots = ''
+        sh.holidays = ''
+        sh.time_slots_weekend = ''
+        sh.time_slots_workdays = ''
+        passed = True
+        try:
+            sh.get_timeslots(datetime.datetime(2021, 3, 29))
+        except TimeSlotParseError as e:
+            print(e)
+            passed = False
+        assert(passed)
 
 if __name__ == '__main__':
 

@@ -1,7 +1,11 @@
 # -*- encoding: utf-8 -*-
 from __future__ import print_function
 
-from app.handlers import DeliveryDatetimesHandler, UploadDeliveryDatetimesHandler
+from app.handlers import (
+    DeliveryDatetimesHandler,
+    DeliveryDatetimesXlsHandler,
+    UploadDeliveryDatetimesXlsHandler,
+)
 from app.models.models import BaseModel
 from app_utils.tornado_utils import create_server
 from settings import (
@@ -12,7 +16,9 @@ from settings import (
 
 EXTERNAL_HANDLERS = [
     (r'/api/v1/delivery_date_times', DeliveryDatetimesHandler),
-    (r'/api/v1/upload_delivery_date_times', UploadDeliveryDatetimesHandler),
+    (r'/api/v1/upload_dates.xls', UploadDeliveryDatetimesXlsHandler),
+    (r'/api/v1/dates.xls', DeliveryDatetimesXlsHandler),
+
 ]
 
 
