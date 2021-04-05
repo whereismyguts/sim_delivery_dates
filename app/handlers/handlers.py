@@ -4,50 +4,41 @@ from collections import OrderedDict
 
 from app.handlers.api_handlers import ApiHandler
 from app.models.models import RegionDeliverySchedule
-from app_utils.xls_utils import load_delivery_slots, export_delivery_slots
+from app_utils.xls_utils import save_delivery_slots_from_file, generate_delivery_slots_file
 
 
 class UploadDeliveryDatetimesXlsHandler(ApiHandler):
 
-    def _get(self, *args, **kwargs):
-        with open(self.XLS_TEMPLATE_PATH, 'rb') as fd:
-            xls_template_data = fd.read()
-
-        self.set_header("Content-Type", "application/octet-stream")
-        return xls_template_data
-
     def _post(self, *args, **kwargs):
-        utcnow = datetime.datetime.utcnow()
 
-        file_name = 'delivery_dates_{}.xlsx'.format(utcnow.strftime('%Y-%m-%dT%H:%M:%S'))
-        if 'xls' not in self.request.files:
+        utcnow = datetime.datetime.utcnow()
+        _file, data = list(self.request.files.items())[0]
+
+        if _file not in ['xls', 'xlsx']:
             return dict(
                 error=1,
                 result=0,
-                reply='need xls'
+                reply='need xls or xlsx'
             )
 
-        file_body = self.request.files['xls'][0]['body']
+        file_name = 'uploaded_delivery_dates_{}.{}'.format(utcnow.strftime('%Y-%m-%dT%H:%M:%S'), _file)
+        file_body = self.request.files[_file][0]['body']
         file_path = os.path.join('data/files/', file_name)
 
         with open(file_path, 'wb') as f:
             f.write(file_body)
 
-        load_delivery_slots(file_path)
-
-        response = dict(
-        )
+        response = save_delivery_slots_from_file(file_path)
         return response
 
 
 class DeliveryDatetimesXlsHandler(ApiHandler):
 
     def _post(self, *args, **kwargs):
-        filename = export_delivery_slots()
-        with open(filename) as f:
+        filename = generate_delivery_slots_file()
+        with open(filename, 'rb') as f:
             out_template_data = f.read()
-            self.set_header("Content-Type", "application/octet-stream")
-            return out_template_data
+            self.write(out_template_data)
 
 
 class DeliveryDatetimesHandler(ApiHandler):

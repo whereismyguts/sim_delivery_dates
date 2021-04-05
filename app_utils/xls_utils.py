@@ -4,14 +4,11 @@ import xlrd
 import xlwt
 
 from app.models.models import RegionDeliverySchedule
-from app_utils.db_utils import create_dbsession
 
 
-def okato_by_regname(regname):
-    return {'МСК+МО': '46000000000'}[regname]
-
-
-def load_delivery_slots(filepath):
+def save_delivery_slots_from_file(filepath):
+    upd = 0
+    add = 0
     xls_data = _load_xlsx(filepath)
     # TODO CHECK data for uniq, regname
     subects_by_okato = defaultdict(set)
@@ -36,12 +33,18 @@ def load_delivery_slots(filepath):
 
         sh.validate_raw_data()
 
+        if sh.id == None:
+            add += 1
+        else:
+            upd += 1
         RegionDeliverySchedule.db_session.add(sh)
 
     RegionDeliverySchedule.db_session.commit()
+    print('UPLOADED: upd {}, add {}'.format(upd, add))
+    return dict(updated_delivery_dates_count=upd, added_delivery_dates_count=add)
 
 
-def export_delivery_slots():
+def generate_delivery_slots_file():
     delivery_data = RegionDeliverySchedule.query().filter(
         RegionDeliverySchedule.deleted == None
     ).order_by(
@@ -76,13 +79,16 @@ def export_delivery_slots():
             sh.time_slots_workdays or '',
             sh.special_time_slots or '',
         ])
-    filename = 'data/files/delivery_datetimes_{}.xlsx'.format(datetime.datetime.utcnow().timestamp())
+    filename = 'data/files/uploaded_delivery_dates_{}.xlsx'.format(
+        datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')
+    )
     _write_xls(filename, [rows])
     print(filename)
     return filename
 
 
-def _write_xls(xls_file_path, data):  # data = [ [ [], ... ], ... ]  xls, sheets, rows or { "sheet name": [ [], ... ], ... }
+def _write_xls(xls_file_path, data):
+    # data = [ [ [], ... ], ... ]  xls, sheets, rows or { "sheet name": [ [], ... ], ... }
     wb = xlwt.Workbook()
 
     for sheet_num, sheet_data in enumerate(data):
@@ -117,6 +123,5 @@ def _load_xlsx(filepath):
 
 
 if __name__ == '__main__':
-    # load_delivery_slots('data/files/delivery_data.xls')
-    export_delivery_slots()
-    # load_delivery_slots('data/files/datetime_courder_slots_example.xlsx')
+    generate_delivery_slots_file()
+    # save_delivery_slots_from_file('data/files/datetime_courder_slots_example.xlsx')
