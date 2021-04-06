@@ -44,11 +44,13 @@ SERVER_AUTH_TOKENS = {
 ## 2.1. Доступ
 Методы API вызываются с заголовком ServerAuthorization, в котором должен быть токен доступа на запись либо на чтение
 Пример вызова:
-```curl -X POST -H "ServerAuthorization: "<access_token>" -H "Content-Length: 116" -d '{"region_id": "45000000000", "local_time": "2021.04.01T16:10:00", "subject": "Москва"}' 'http://10.77.35.96:9028/api/v1/delivery_date_times'```
+```
+curl -X POST -H "ServerAuthorization: "<access_token>" -H "Content-Length: 116" -d '{"region_id": "45000000000", "local_time": "2021.04.01T16:10:00", "subject": "Москва"}' 'http://10.77.35.96:9028/api/v1/delivery_date_times'
+```
 
 ## 2.2. Методы API
 
-### 2.2.3. Загрузка слотов доставки файлом
+### 2.2.3. Загрузить слоты доставки файлом
 ```
 POST /api/v1/upload_dates.xls
 ->
@@ -93,7 +95,7 @@ POST /api/v1/delivery_date_time
 }
 ```
 
-### 2.2.5. Загрузка слотов доставки файлом
+### 2.2.5. Получить слоты доставки файлом
 ```
 POST /api/v1/dates.xls
 <- <xlsx файл>
