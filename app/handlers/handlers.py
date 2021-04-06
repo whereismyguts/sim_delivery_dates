@@ -14,7 +14,7 @@ def validate_token_access(need_write=False):
     def decorator(func):
         @wraps(func)
         def wrapper(self, *args, **kwargs):
-            auth_header = self.request.headers.get(
+            auth_header = self.headers.get(
                 'ServerAuthorization', ''
             ).strip()
             # print(auth_header, method)
