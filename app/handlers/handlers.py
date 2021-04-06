@@ -1,12 +1,44 @@
 import datetime
 import os
 from collections import OrderedDict
+from functools import wraps
 
+from app.exceptions import ApiError
 from app.handlers.api_handlers import ApiHandler
 from app.models.models import RegionDeliverySchedule
 from app_utils.xls_utils import save_delivery_slots_from_file, generate_delivery_slots_file
+from settings import SERVER_AUTH_TOKENS
 
 
+def validate_token_access(need_write=False):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            auth_header = self.request.headers.get(
+                'ServerAuthorization', ''
+            ).strip()
+            # print(auth_header, method)
+            # print(SERVER_AUTH_TOKENS)
+            if auth_header in SERVER_AUTH_TOKENS:
+                granted_mode = SERVER_AUTH_TOKENS[auth_header]
+                if granted_mode != 'write' and need_write:
+                    return dict(
+                        reply='permission denied',
+                        error=1,
+                    )
+            else:
+                return dict(
+                    reply='bad_token',
+                    error=1,
+                )
+            return func(self, *args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
+@validate_token_access(need_write=True)
 class UploadDeliveryDatetimesXlsHandler(ApiHandler):
 
     def _post(self, *args, **kwargs):
@@ -32,6 +64,7 @@ class UploadDeliveryDatetimesXlsHandler(ApiHandler):
         return response
 
 
+@validate_token_access()
 class DeliveryDatetimesXlsHandler(ApiHandler):
 
     def _post(self, *args, **kwargs):
@@ -41,6 +74,7 @@ class DeliveryDatetimesXlsHandler(ApiHandler):
             self.write(out_template_data)
 
 
+@validate_token_access()
 class DeliveryDatetimesHandler(ApiHandler):
 
     def _post(self, *args, **kwargs):
