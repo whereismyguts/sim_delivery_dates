@@ -14,7 +14,7 @@ def validate_token_access(need_write=False):
     def decorator(func):
         @wraps(func)
         def wrapper(self, *args, **kwargs):
-            auth_header = self.headers.get(
+            auth_header = self.request.headers.get(
                 'ServerAuthorization', ''
             ).strip()
             # print(auth_header, method)
@@ -38,9 +38,9 @@ def validate_token_access(need_write=False):
     return decorator
 
 
-@validate_token_access(need_write=True)
 class UploadDeliveryDatetimesXlsHandler(ApiHandler):
 
+    @validate_token_access(need_write=True)
     def _post(self, *args, **kwargs):
 
         utcnow = datetime.datetime.utcnow()
@@ -64,9 +64,9 @@ class UploadDeliveryDatetimesXlsHandler(ApiHandler):
         return response
 
 
-@validate_token_access()
 class DeliveryDatetimesXlsHandler(ApiHandler):
 
+    @validate_token_access()
     def _post(self, *args, **kwargs):
         filename = generate_delivery_slots_file()
         with open(filename, 'rb') as f:
@@ -74,9 +74,9 @@ class DeliveryDatetimesXlsHandler(ApiHandler):
             self.write(out_template_data)
 
 
-@validate_token_access()
 class DeliveryDatetimesHandler(ApiHandler):
 
+    @validate_token_access()
     def _post(self, *args, **kwargs):
         region_id = self.data.get('region_id')  # '41000000000'
         local_time = self.data.get('local_time')  # '2021.02.14T16:10:00'
