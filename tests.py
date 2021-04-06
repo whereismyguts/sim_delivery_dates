@@ -90,3 +90,5 @@ if __name__ == '__main__':
 
     for test in filter(lambda method: 'test' in method, dir(TestSuit)):
         getattr(TestSuit, test)()
+
+    print('ALL TESTS PASSED')

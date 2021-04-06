@@ -9,7 +9,6 @@ from app.handlers import (
 from app.models.models import BaseModel
 from app_utils.tornado_utils import create_server
 from settings import (
-    APP_SETTINGS,
     DEBUG, PORT, DB_PATH,
     PROCESSES_NUM,
 )

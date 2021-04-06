@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 from app.models.declarative import AppDecBase
 from app_utils.db_utils.models import jsonb_property, BaseModel
 from sqlalchemy import Column, Integer, DateTime, String
