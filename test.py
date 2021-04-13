@@ -5,7 +5,7 @@ import requests
 def getcurl(req):
     command = "curl -X {method} -H {headers} -d '{data}' '{uri}'"
     method = req.method
-    uri = req.url   
+    uri = req.url
     data = req.body
     headers = ['"{0}: {1}"'.format(k, v) for k, v in req.headers.items()]
     headers = " -H ".join(headers)
@@ -15,6 +15,17 @@ def json_data(**kwargs):
     # if 'token' not in kwargs:
     #     kwargs['token'] = TOKEN
     return json.dumps(kwargs)
+
+
+def test_admin():
+    data = {"delivery_type":"order_sim","delivery_region":"СПБ+ЛО","city":"Елизоаветинка"}
+    headers = {
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXJ2ZXIiOiJUZXN0U2JlclRlbGVjb21UYWIiLCJ1dHlwIjoiYWRtaW4iLCJleHAiOjE2MTc4NzM4ODkuNzM5NTIzLCJqdGkiOjEyNzI2ODkxLCJqdHYiOjEuMCwidHR5cCI6ImFjY2VzcyIsImlzcyI6Im1haW4iLCJjaGFubmVsIjoiXHUwNDFlXHUwNDQ0XHUwNDM4XHUwNDQxIn0.5K2eSKMlQDdBjQtl5iHRY7_XGJBosymhwL7sOeklHXk'
+    }
+    url = 'https://test-podkliuchi.sberbank-tele.com/admin/api/v1/corders.create.get_datetimes'
+
+    r = requests.post(url, data=json_data(**data), headers=headers)
+    print(r, r.text)
 
 def test_server():
     data = {'region_id': '45000000000', 'local_time': '2021.04.01T16:10:00', 'subject': u'Москва'}
@@ -29,7 +40,7 @@ def test_server():
 
 def test_current():
     data = {
-      'local_time': '2021.04.01T16:10:00', 
+      'local_time': '2021.04.01T16:10:00',
       # 'default_region': u'Агрогородок',
     }
     print(u'requested url:')
@@ -40,7 +51,7 @@ def test_current():
     response = requests.post(url, data=json_data(**data))
     # print(response, response.text)
     data = response.json()
-    
+
     print('ANSWER: ')
 
     cap = 10
@@ -50,7 +61,7 @@ def test_current():
             v = {kk: v[kk] for kk in list(v.keys())[:cap]}
         elif isinstance(v, list):
             v = v[:cap]
-        
+
         data[k] = v
 
     # print(v)
@@ -58,4 +69,7 @@ def test_current():
     return data
 
 # data = test_current()
-data = test_server()
+# data = test_server()
+test_admin()
+
+

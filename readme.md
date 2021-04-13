@@ -11,6 +11,7 @@
 ```sudo -E yum install python-devel```
 ```sudo -E bin/python -m pip install -r requirements.txt```
 
+
 ## 1.3. Настройки
 создать файл settings.py в корне проекта
 пример файла настроек с необходимыми параметрами:
@@ -19,11 +20,10 @@
 # settings.py
 DEBUG = True
 PROCESSES_NUM = 1
-DB_PATH = 'postgresql://podkluchi:<password>@<db_ip>:<db_port>/<>db_name'
+DB_PATH = 'postgresql://<db-user>:<password>@<db_ip>:<db_port>/<db_name>'
 
 SERVER_SCHEMA = 'https'
-SERVER_HOST = 'test-podkliuchi.sberbank-tele.com'
-SERVER_NAME = 'TestSberTelecomTab'
+SERVER_HOST = '<server url>'
 
 PORT = SERVER_PORT = 9008
 
@@ -35,9 +35,14 @@ SERVER_AUTH_TOKENS = {
 }
 ```
 
-## 1.4. Запуск сервера
+## 1.4. Создание таблиц бд
+```bin/python sync_db.py```
+
+## 1.5. Запуск
+
+### 1.5.1. Запуск сервера
 ```bin/python server.py```
-Запуск модульных тестов загрузки файлом (тесты разметки):
+### 1.5.2. Запуск модульных тестов загрузки файлом (тесты разметки):
 ```bin/python tests.py```
 
 # 2. Руководство по использованию API
